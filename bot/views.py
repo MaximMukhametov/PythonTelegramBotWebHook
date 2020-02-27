@@ -87,3 +87,41 @@ def exchange(message):
         bot.send_message(message.chat.id,'%s %s = %.2f %s' % (value, val1_name, result, val2_name))
     except:
         bot.send_message(message.chat.id,'Invalid input format.\nexample of the correct format:\n/exchange 10 DKK to CZK, or $10 to RUB')
+
+@bot.message_handler(commands=['history'])
+def history(message):
+    try:
+        # parsing currencies and number of days
+        val1, val2 = [i.upper() for i in message.text.split()[1].split('/')]
+        days = int(message.text.split()[-2])
+
+        # set GET parameters for exchangeratesapi
+        params = {
+            'start_at': date.today() - timedelta(days=days),
+            'end_at': date.today(),
+            'symbols': val2,
+            'base': val1,
+        }
+
+        res = requests.get(api_url_history, params)
+        data = res.json()
+        x, y = [], []
+        key_list = list(data['rates'].keys())
+        key_list.sort()
+        for i in key_list:
+            x.append(i)
+            y.append(data['rates'][i][val2])
+
+        # create a graph
+        fig = figure()
+        ax = fig.add_subplot(111)
+        ax.plot(x, y, 'r')
+        fig.autofmt_xdate()
+        xlabel('Date')
+        ylabel('%s/%s' % (val1, val2))
+        title('Exchange rate for the last %s days' % days)
+        savefig('myfig.png')
+        graph = open('myfig.png', 'rb')
+        bot.send_photo(message.chat.id,graph)
+    except:
+        bot.send_message(message.chat.id, 'No exchange rate data is available for the selected currency.')
