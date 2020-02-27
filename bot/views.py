@@ -75,7 +75,7 @@ def show_list(message):
 def exchange(message):
     # using a block "try-except" is considered bad practice, but in this case it’s acceptable.
     try:
-        args = message.text[1:]
+        args = message.text.split()[1:]
         val2, val2_name = float(data['rates'][args[-1].upper()]), args[-1].upper()
         if '$' in args[0]:
             val1, val1_name = 1, 'USD'
