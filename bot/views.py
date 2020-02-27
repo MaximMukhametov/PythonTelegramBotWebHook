@@ -63,12 +63,27 @@ def start(message):
 def show_list(message):
     textrates = ""
     if time_update < datetime.now()-timedelta(minutes=10):
-        bot.send_message(message.chat.id, 'if')
         update_base(textrates, message)
 
     # if less than 10 minutes have passed, we take data from the database.
     else:
-        bot.send_message(message.chat.id, 'else,%s' % message.text)
         for base in Rates.objects.all():
             textrates += ('%s: %s %s' % (base.name, base.value, '\n'))
         bot.send_message(message.chat.id,textrates)
+
+@bot.message_handler(commands=['exchange'])
+def exchange(message):
+    # using a block "try-except" is considered bad practice, but in this case it’s acceptable.
+    try:
+        args = message.text[1:]
+        val2, val2_name = float(data['rates'][args[-1].upper()]), args[-1].upper()
+        if '$' in args[0]:
+            val1, val1_name = 1, 'USD'
+            value = float(args[0][1:])
+        else:
+            val1, val1_name = float(data['rates'][args[-3].upper()]), args[-3].upper()
+            value = float(args[0])
+        result = val2*value/val1
+        bot.send_message(message.chat.id,'%s %s = %.2f %s' % (value, val1_name, result, val2_name))
+    except:
+        bot.send_message(message.chat.id,'Invalid input format.\nexample of the correct format:\n/exchange 10 DKK to CZK, or $10 to RUB')
