@@ -59,15 +59,16 @@ def start(message):
                                    'shows the exchange rate graph/chart of the selected currency for the last N days.')
 
 
-
 @bot.message_handler(commands=['list','lst'])
 def show_list(message):
     textrates = ""
     if time_update < datetime.now()-timedelta(minutes=10):
+        bot.send_message(message.chat.id, 'if')
         update_base(textrates, message)
 
     # if less than 10 minutes have passed, we take data from the database.
     else:
+        bot.send_message(message.chat.id, 'else')
         for base in Rates.objects.all():
             textrates += ('%s: %s %s' % (base.name, base.value, '\n'))
         bot.send_message(message.chat.id,textrates)
