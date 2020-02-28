@@ -27,7 +27,7 @@ class UpdateBot(APIView):
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    bot.send_message(message.chat.id, 'Write a chat "/" to see a list of commands\n'
+    bot.send_message(message.chat.id, 'Write "/" in chat to see a list of commands\n'
                                    '/start - help text\n'
                                    '/list or /lst - returns list of all available rates\n'
                                    '/exchange $10 to CAD or  /exchange 10 USD to CAD - converts to \n'
